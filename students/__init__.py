@@ -1,0 +1,2 @@
+import students.StudentSubscription
+Student = students.StudentSubscription.StudentSubscription
