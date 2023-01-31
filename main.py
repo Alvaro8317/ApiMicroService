@@ -4,7 +4,7 @@ from typing import List
 import data
 from config import create_config_doc
 from middlewares import valid_subs
-from errors import bad_request, exit_code, write_log
+from errors import exit_code, write_log
 from students import Student
 
 app = FastAPI()
@@ -12,7 +12,7 @@ create_config_doc(app)
 student_data = data.create_data()
 
 
-def invalid_id(bad_req: str, msg_code: str, code: int = 1):
+def log_and_exit(bad_req: str, msg_code: str, code: int = 1):
     write_log(bad_req)
     exit_code(msg_code, code)
 
@@ -50,7 +50,7 @@ async def get_data_by_id(id: str):
     if (result):
         return JSONResponse(content=select_a_student(id))
     else:
-        invalid_id("Invalid ID", "the ID does not exist or is badly formated")
+        log_and_exit("Invalid ID", "the ID does not exist or is badly formated")
 
 
 @app.patch("/students/{id}", tags=["Students"], status_code=202)
@@ -67,10 +67,8 @@ async def change_student_subscription(id: str, subscription: str):
                 student_instance.update_subscription(subscription)
                 return JSONResponse(content={"message": "Updated successfully", "student": selected_student[0]})
             else:
-                JSONResponse(content=bad_request("Invalid subscription"))
-                exit_code("The target subscription level is not reachable",2)
+                log_and_exit("Invalid target subscription ", "the target subscription level is not reachable",2)
         else:
-            invalid_id("Invalid ID", "the ID does not exist or is badly formated")
+            log_and_exit("Invalid ID", "the ID does not exist or is badly formated", 1)
     except Exception as err:
-        write_log(err)
-        exit_code("other unknown error", 3)
+        log_and_exit(err, "other unknown error", 3)
