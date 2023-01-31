@@ -1,0 +1,2 @@
+import middlewares.validate_subscription
+valid_subs = middlewares.validate_subscription.validate_subs
